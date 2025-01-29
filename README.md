@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 
-Efficient caching layer for Hugging Face models using PyTorch serialization. Accelerate model initialization while reducing disk redundancy by converting native Hugging Face checkpoints to optimized PyTorch format.
+Efficient caching layer for Hugging Face models using PyTorch serialisation. Accelerate model initialisation while reducing disk redundancy by converting native Hugging Face checkpoints to optimised PyTorch format.
 
 ## Features
 
@@ -79,7 +79,7 @@ model, tokenizer = cache.load(
 ## Implementation Notes
 
 1. **First-Run Behavior**: Initial load converts HF checkpoint to optimized PyTorch format
-2. **Subsequent Loads**: Directly loads serialized PyTorch artifacts (3-5x faster)
+2. **Subsequent Loads**: Directly loads serialised PyTorch artifacts (3-5x faster)
 3. **Device Management**: Specify `map_location` to control device placement
 4. **Security**: Use `weights_only=True` when loading untrusted models
 
