@@ -6,7 +6,8 @@ import logging
 import shutil
 from importlib import import_module
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable, TypeVar, Union
+from typing import TYPE_CHECKING, TypeVar, Union
+from collections.abc import Callable
 
 import torch
 from platformdirs import user_cache_dir
@@ -61,7 +62,7 @@ def load_local_hf_tokenizer(
             pass  # Could type check it here but just proceed
         case _:
             raise TypeError(
-                f"tokenizer_cls must be 'auto', a name or type, got {tokenizer_cls}"
+                f"tokenizer_cls must be 'auto', a name or type, got {tokenizer_cls}",
             )
 
     return tokenizer_cls.from_pretrained(hf_dir)
@@ -123,14 +124,17 @@ class HFTorchCache:
             Tuple of (model, tokeniser)
         """
         hftc_cache = self._get_cache_path(
-            model_name, config={"weights_only": weights_only, "causal": causal}
+            model_name,
+            config={"weights_only": weights_only, "causal": causal},
         )
 
         if hftc_cache.exists():
             logger.info(f"Loading cached model from {hftc_cache}")
             try:
                 model, tokeniser = torch.load(
-                    hftc_cache, map_location=map_location, weights_only=weights_only
+                    hftc_cache,
+                    map_location=map_location,
+                    weights_only=weights_only,
                 )
                 return model, tokeniser
             except Exception as e:
@@ -141,12 +145,14 @@ class HFTorchCache:
             model_kwargs = {**dict(low_cpu_mem_usage=True), **model_kwargs}
             try:
                 hf_cache_dir = hf_hub_download(
-                    model_name, filename="", local_files_only=local_files_only
+                    model_name,
+                    filename="",
+                    local_files_only=local_files_only,
                 )
             except LocalEntryNotFoundError as exc:
                 # Cache miss when `local_files_only` is True - do not load from HF Hub
                 raise FileNotFoundError(
-                    f"No local HF cache for {model_name} nor pre-existing hftc cache"
+                    f"No local HF cache for {model_name} nor pre-existing hftc cache",
                 ) from exc
             else:
                 logger.info(f"Loading cached model from {hftc_cache}")
