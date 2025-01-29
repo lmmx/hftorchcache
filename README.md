@@ -51,8 +51,8 @@ model, tokenizer = cache.load(
     tokenizer_cls="AutoTokenizer",
     map_location=torch.device("cuda:0"),
     weights_only=False,                  # Enable for untrusted sources
-    torch_dtype=torch.bfloat16,
     local_only=True                      # Prevent HF Hub fallback
+    # **model_kwargs                     # Would be passed to `from_pretrained`
 )
 ```
 
