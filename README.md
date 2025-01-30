@@ -24,7 +24,7 @@ pip install hftorchcache
 ### Basic Example
 
 ```python
-from hftorchcache import HFTorchCache
+from hftc import HFTorchCache
 
 # Initialise cache manager
 cache = HFTorchCache()
