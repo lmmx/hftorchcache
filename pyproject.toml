@@ -6,7 +6,7 @@ build-backend = "pdm.backend"
 
 [project]
 name = "hftorchcache"
-version = "0.0.1"
+version = "0.0.2"
 description = "Efficient caching of Hugging Face models using PyTorch serialisation"
 authors = [
   {name = "Louis Maddox", email = "louismmx@gmail.com"}
