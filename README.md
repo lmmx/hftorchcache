@@ -56,6 +56,17 @@ model, tokenizer = cache.load(
 )
 ```
 
+Note that you may need additional packages (e.g. `bitsandbytes`) to load cached models.
+
+### Cleanup utilities
+
+You can also use the internal `_cleanup_hf_cache` method to delete the entire model directories of
+models you're done with, without trying to load them (as long as HuggingFace can find a snapshot).
+
+```python
+cache._cleanup_hf_cache("Qwen/Qwen2.5-7B-Instruct-GPTQ-Int8")
+```
+
 ## API Reference
 
 ### `HFTorchCache`

@@ -178,6 +178,7 @@ class HFTorchCache:
     def _cleanup_hf_cache(self, model_name: str) -> None:
         """Remove original HF cache files for the model"""
         try:
+            from huggingface_hub import hf_hub_download
             from transformers.utils import TRANSFORMERS_CACHE
 
             hf_cache = Path(TRANSFORMERS_CACHE)
