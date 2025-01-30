@@ -133,23 +133,25 @@ class HFTorchCache:
         if hftc_cache.exists():
             logger.info(f"Loading cached model from {hftc_cache}")
             try:
-                model, tokeniser = torch.load(
+                model, tokenizer = torch.load(
                     hftc_cache,
                     map_location=map_location,
                     weights_only=weights_only,
                 )
-                return model, tokeniser
             except Exception as e:
                 logger.warning(f"Failed to load cached model: {e}")
                 hftc_cache.unlink(missing_ok=True)
-        else:
+
+        if not hftc_cache.exists():
+            from huggingface_hub import hf_hub_download
+            from huggingface_hub.errors import LocalEntryNotFoundError
+
             logger.info(f"Transferring HuggingFace model to {hftc_cache}")
             model_kwargs = {**dict(low_cpu_mem_usage=True), **model_kwargs}
+
             try:
                 hf_cache_dir = hf_hub_download(
-                    model_name,
-                    filename="",
-                    local_files_only=local_files_only,
+                    model_name, filename="", local_files_only=local_only
                 )
             except LocalEntryNotFoundError as exc:
                 # Cache miss when `local_files_only` is True - do not load from HF Hub
@@ -160,38 +162,35 @@ class HFTorchCache:
                 logger.info(f"Loading cached model from {hftc_cache}")
                 model = load_local_hf_model(hf_cache_dir, cls=model_cls, **model_kwargs)
                 tokenizer = load_local_hf_tokenizer(hf_cache_dir, cls=tokenizer_cls)
-
-        # Move to target device before saving
-        if device:
-            model = model.to(device)
-
-        # Cache the loaded model
-        logger.info(f"Caching model to {hftc_cache}")
-        torch.save((model, tokeniser), hftc_cache)
+                # Cache the loaded model
+                logger.info(f"Caching model to {hftc_cache}")
+                torch.save((model.cpu(), tokenizer), hftc_cache)
+                model, tokenizer = torch.load(
+                    hftc_cache, map_location=map_location, weights_only=weights_only
+                )
 
         # Cleanup original HF cache if requested
         if self.cleanup_original:
             self._cleanup_hf_cache(model_name)
 
-        return model, tokeniser
+        return model, tokenizer
 
     def _cleanup_hf_cache(self, model_name: str) -> None:
         """Remove original HF cache files for the model"""
         try:
-            # Get HF cache directory
             from transformers.utils import TRANSFORMERS_CACHE
 
             hf_cache = Path(TRANSFORMERS_CACHE)
+            # Get the model's cache directory by using hf_hub_download
+            model_path = Path(
+                hf_hub_download(model_name, filename="", local_files_only=True)
+            )
+            # Get the root model directory (removes snapshots/hash part)
+            model_dir = hf_cache / model_path.relative_to(TRANSFORMERS_CACHE).parts[0]
 
-            # Find and remove model files
-            safe_name = model_name.replace("/", "--")
-            for file in hf_cache.glob(f"*{safe_name}*"):
-                if file.is_file():
-                    file.unlink()
-                elif file.is_dir():
-                    shutil.rmtree(file)
-
-            logger.info(f"Cleaned up HF cache for {model_name}")
+            if model_dir.exists():
+                shutil.rmtree(model_dir)
+                logger.info(f"Cleaned up HF cache directory: {model_dir}")
         except Exception as e:
             logger.warning(f"Failed to cleanup HF cache: {e}")
         return
