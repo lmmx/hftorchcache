@@ -4,10 +4,10 @@ import hashlib
 import json
 import logging
 import shutil
+from collections.abc import Callable
 from importlib import import_module
 from pathlib import Path
-from typing import TYPE_CHECKING, TypeVar, Union
-from collections.abc import Callable
+from typing import TYPE_CHECKING, Literal, TypeVar, Union
 
 import torch
 from platformdirs import user_cache_dir
@@ -35,6 +35,8 @@ def load_local_hf_model(
 ) -> ModelT:
     match cls:
         case "auto":
+            from transformers import AutoConfig
+
             model_config = AutoConfig.from_pretrained(hf_dir)
             # Could allow options here if this is ever an issue, here just pick #1
             model_cls_name = model_config.architectures[0]
@@ -125,7 +127,7 @@ class HFTorchCache:
         """
         hftc_cache = self._get_cache_path(
             model_name,
-            config={"weights_only": weights_only, "causal": causal},
+            config={"weights_only": weights_only},
         )
 
         if hftc_cache.exists():
