@@ -21,22 +21,34 @@ pip install hftorchcache
 
 ## Usage
 
-### Basic Example
+Simply pass a model name (the HuggingFace repo ID) and the model will be loaded and saved as a torch
+`.pt` file in `~/.cache/hftc/`.
 
 ```python
 from hftc import HFTorchCache
+
+MODEL_NAME = "unsloth/DeepSeek-R1-Distill-Qwen-7B-bnb-4bit"
 
 # Initialise cache manager
 cache = HFTorchCache()
 
 # Load model with automatic class detection
-model, tokenizer = cache.load(
-    "unsloth/DeepSeek-R1-Distill-Qwen-7B-bnb-4bit",
-    map_location="cuda"
-)
+model, tokenizer = cache.load(MODEL_NAME)
+
+print(model.device) # "cuda" if GPU available
 ```
 
-### Advanced Usage
+If it's already been cached, it'll load instantly
+
+There are also options to:
+
+- Delete the original HuggingFace model cache directory (to avoid duplicates)
+- Only load from the local HuggingFace cache
+- Specify a value to pass as the device (`torch.load` defaults to using GPU if available)
+- Loading weights only (but this defeats the purpose of this method, which is to load the entire
+  variable fast, like pickle)
+- Specify a particular model class by name or by the type itself (it should detect the model
+  automatically)
 
 ```python
 cache = HFTorchCache(
@@ -56,7 +68,8 @@ model, tokenizer = cache.load(
 )
 ```
 
-Note that you may need additional packages (e.g. `bitsandbytes`) to load cached models.
+Note that you may need additional packages (e.g. `bitsandbytes`) to load cached models. Accelerate
+is a dependency of this package, and `low_cpu_mem_usage` is always passed as True to `from_pretrained`.
 
 ### Cleanup utilities
 
