@@ -151,7 +151,9 @@ class HFTorchCache:
 
             try:
                 hf_cache_dir = hf_hub_download(
-                    model_name, filename="", local_files_only=local_only
+                    model_name,
+                    filename="",
+                    local_files_only=local_only,
                 )
             except LocalEntryNotFoundError as exc:
                 # Cache miss when `local_files_only` is True - do not load from HF Hub
@@ -166,7 +168,9 @@ class HFTorchCache:
                 logger.info(f"Caching model to {hftc_cache}")
                 torch.save((model.cpu(), tokenizer), hftc_cache)
                 model, tokenizer = torch.load(
-                    hftc_cache, map_location=map_location, weights_only=weights_only
+                    hftc_cache,
+                    map_location=map_location,
+                    weights_only=weights_only,
                 )
 
         # Cleanup original HF cache if requested
@@ -184,7 +188,7 @@ class HFTorchCache:
             hf_cache = Path(TRANSFORMERS_CACHE)
             # Get the model's cache directory by using hf_hub_download
             model_path = Path(
-                hf_hub_download(model_name, filename="", local_files_only=True)
+                hf_hub_download(model_name, filename="", local_files_only=True),
             )
             # Get the root model directory (removes snapshots/hash part)
             model_dir = hf_cache / model_path.relative_to(TRANSFORMERS_CACHE).parts[0]
