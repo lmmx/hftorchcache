@@ -198,7 +198,6 @@ class HFTorchCache:
                 logger.info(f"Cleaned up HF cache directory: {model_dir}")
         except Exception as e:
             logger.warning(f"Failed to cleanup HF cache: {e}")
-        return
 
     def clear_cache(self, model_name: str | None = None) -> None:
         """
@@ -213,4 +212,3 @@ class HFTorchCache:
         else:
             shutil.rmtree(self.cache_dir)
             self.cache_dir.mkdir(parents=True)
-        return
