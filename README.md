@@ -35,7 +35,7 @@ cache = HFTorchCache()
 # Load model with automatic class detection
 model, tokenizer = cache.load(MODEL_NAME)
 
-print(model.device) # "cuda" if GPU available
+print(model.device)  # "cuda" if GPU available
 ```
 
 If it's already been cached, it'll load instantly
@@ -53,17 +53,17 @@ There are also options to:
 ```python
 cache = HFTorchCache(
     cache_dir="/custom/cache/path",  # Default: ~/.cache/hftc
-    cleanup_original=True            # Auto-delete original HF cache
+    cleanup_original=True,  # Auto-delete original HF cache
 )
 
 # Load with explicit device placement and safety controls
 model, tokenizer = cache.load(
     "unsloth/DeepSeek-R1-Distill-Qwen-7B-bnb-4bit",
-    model_cls="AutoModelForCausalLM",    # Explicit class specification
+    model_cls="AutoModelForCausalLM",  # Explicit class specification
     tokenizer_cls="AutoTokenizer",
     map_location=torch.device("cuda:0"),
-    weights_only=False,                  # Enable for untrusted sources
-    local_only=True                      # Prevent HF Hub fallback
+    weights_only=False,  # Enable for untrusted sources
+    local_only=True,  # Prevent HF Hub fallback
     # **model_kwargs                     # Would be passed to `from_pretrained`
 )
 ```
